@@ -10,16 +10,17 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
 public class HtmlPane extends JEditorPane {
-
-    Node document;
-    File file;
+    private Node document;
 
     public HtmlPane() {
         setEditable(false);
@@ -51,39 +52,24 @@ public class HtmlPane extends JEditorPane {
 
     }
 
-    public void load(File file) {
+    public void load(String md) {
         MarkdownParser parser = new MarkdownParser();
-        String parent;
-        try {
-            file = file.getCanonicalFile();
-            parent = file.getParentFile().getCanonicalPath();
-        } catch (IOException e1) {
-            parent = new File(System.getProperty(".")).getAbsolutePath();
-        }
-        parser.parse(file);
+
+        parser.parse(md);
         document = parser.getDocument();
-        this.file = file;
-        parser.updatefileimages(parent);
         String html = parser.getHTML();
         if (html != null) {
-            try {
-                URL url = new URL("file", "", parent);
-                //System.out.println(url.toString());
-                HTMLDocument doc = (HTMLDocument) getDocument();
-                doc.setBase(url);
-                setDocument(doc);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            //System.out.println(url.toString());
+            HTMLDocument doc = (HTMLDocument) getDocument();
+
+            setDocument(doc);
             setText(html);
             setCaretPosition(0);
         }
     }
 
     public void reload() {
-        if (this.file != null) {
-            load(this.file);
-        }
+
     }
 
     public void HTMLLocalImages(String surl, Image image) {
@@ -121,31 +107,10 @@ public class HtmlPane extends JEditorPane {
         return parser.getText();
     }
 
-    public String getMD() {
-        StringBuilder sb = new StringBuilder(1000);
-        if (file == null)
-            return "";
-
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-                sb.append('\n');
-            }
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
-    }
-
-	/*
 	public String getMD() {
 		MarkdownParser parser = new MarkdownParser(document);
 		return parser.getMD();		
 	}
-	*/
 
     public String getCSS() {
         StringBuilder sb = new StringBuilder(1024);
@@ -172,14 +137,4 @@ public class HtmlPane extends JEditorPane {
     public void setMDocument(Node document) {
         this.document = document;
     }
-
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
-    }
-
-
 }
