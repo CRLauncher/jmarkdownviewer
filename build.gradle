@@ -1,0 +1,25 @@
+plugins {
+    id "java"
+}
+
+group = "org.jmarkdownviewer"
+version = "0.0.1"
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    commonmark = '0.24.0'
+}
+
+dependencies {
+    implementation "org.commonmark:commonmark:$commonmark"
+    implementation "org.commonmark:commonmark-ext-image-attributes:$commonmark"
+    implementation "org.commonmark:commonmark-ext-gfm-tables:$commonmark"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
